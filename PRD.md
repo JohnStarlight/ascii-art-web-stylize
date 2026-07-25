@@ -1,224 +1,91 @@
-# PRD — ascii-art-web (Zone01)
+# ASCII-ART-WEB — Πλάνο για τα 3 Optional
 
-## Σκοπός
+## 1. Το πρόβλημα που λύνουμε
 
-Δημιουργία web εφαρμογής σε Go που δέχεται κείμενο από τον χρήστη μέσω φόρμας και επιστρέφει το αντίστοιχο ASCII art, χρησιμοποιώντας banner αρχεία (standard, shadow, thinkertoy). Υποστηρίζει χρωματισμό του output μέσω dropdown επιλογής χρώματος και προαιρετικού substring. Χρησιμοποιείται **μόνο** η standard library της Go.
+Στο πρώτο project ο καθένας πήρε ένα σιλό: άλλος server, άλλος HTML, άλλος algorithm. Αποτέλεσμα: **κανείς δεν ήξερε τι έκαναν οι άλλοι**. Δούλεψε, αλλά μάθαμε το 1/3.
 
----
+Τώρα έχουμε 3 optional (stylize, export-file, dockerize). Αν τα μοιράσουμε «ένα στον καθένα», το ίδιο πράγμα θα ξαναγίνει — απλά τρεις φορές.
 
-## Τεχνικές Απαιτήσεις (Zone01)
+## 2. Η αρχή
 
-- Γλώσσα: **Go**
-- Packages: μόνο standard library
-- Port: **8080**
-- HTTP methods: GET (αρχική σελίδα), POST (αποστολή φόρμας)
-- Banner styles: `standard`, `shadow`, `thinkertoy`
-- HTTP status codes:
-  - `200 OK` — επιτυχής απόκριση
-  - `400 Bad Request` — λανθασμένο input
-  - `404 Not Found` — άγνωστο path
-  - `500 Internal Server Error` — σφάλμα server
-- Το πρόγραμμα **δεν πρέπει να κρασάρει** σε καμία περίπτωση
+**3 projects × 3 φάσεις = 9 slices.** Ο καθένας παίρνει ένα slice από κάθε project, με rotation.
 
----
+Δύο κανόνες που κάνουν τη διαφορά:
 
-## Δομή Project
+- **Κάθε slice περιέχει Go + HTML/CSS + υποδομή.** Αν ένα κομμάτι βγει «μόνο CSS» ή «μόνο Dockerfile», είναι λάθος κομμένο.
+- **Κανείς δεν γράφει σε παρθένο αρχείο.** Από τον Γύρο 2 και μετά, για να προσθέσεις κάτι πρέπει πρώτα να διαβάσεις και να καταλάβεις τον κώδικα του προηγούμενου. Αυτό είναι το κύριο εργαλείο μάθησης — όχι το rotation καθαυτό.
 
-```
-ascii-art-web/
-├── main.go
-├── handlers/
-│   └── handlers.go
-├── ascii/
-│   └── ascii.go
-├── banners/
-│   ├── standard.txt
-│   ├── shadow.txt
-│   └── thinkertoy.txt
-└── templates/
-    └── index.html
-```
+## 3. Τα 3 βήματα
 
----
+1. **Build** — 3 γύροι rotation
+2. **Good practices & δομή** — έλεγχος από όλους μαζί
+3. **Tests** — έλεγχος ότι περνάει
 
-## Χωρισμός Εργασίας
+## 4. Ο πίνακας
 
----
+| | Άτομο 1 | Άτομο 2 | Άτομο 3 |
+|---|---|---|---|
+| **Γύρος 1** | Export A | Docker A | Stylize A |
+| **Γύρος 2** | Docker B | Stylize B | Export B |
+| **Γύρος 3** | Stylize C | Export C | Docker C |
 
-### Άτομο 1 — HTTP Server & Routing
+Κάθε γραμμή καλύπτει και τα 3 projects. Διαλέγετε στήλη — εγώ παίρνω ό,τι μείνει.
 
-**Αρχεία:** `main.go`, `handlers/handlers.go`
+### Export
 
-#### Καθήκοντα
+**A** — endpoint `/export` + routing · **registry map** για τα formats (βλ. §5) · writer για `.txt` · refactor στο `ascii` ώστε να βγάζει καθαρό output χωρίς `<span>` · κουμπί Export στη φόρμα + βασικό styling · τα 3 υποχρεωτικά headers (Content-Type, Content-Length, Content-Disposition) · file permissions rw
 
-1. **`main.go`** — εκκίνηση server
-   - `http.ListenAndServe(":8080", nil)`
-   - Καταχώρηση routes (`/`, `/ascii-art`)
-   - Log μηνύματα εκκίνησης
+**B** — writer για `.rtf` (κρατάει χρώματα, θέλει ρητή δήλωση monospace font) · δηλώνεται στο registry · dropdown επιλογής format στη φόρμα + styling
 
-2. **GET `/`** — αρχική σελίδα
-   - Φόρτωση και render του `templates/index.html`
-   - Επιστροφή `200 OK`
-   - Σε άγνωστο path → `404`
+> ⚠️ Δοκίμασε **πρώτα** αν ανοίγει σωστά ένα χειροποίητο `.rtf`, μετά γράψε handler. Αν αποδειχθεί πρόβλημα, εναλλακτική είναι το `.svg`.
 
-3. **POST `/ascii-art`** — λήψη φόρμας
-   - Parse των form values (`text`, `banner`, `color`, `letters`)
-   - Validation input (κενό text, μη έγκυρο banner, non-ASCII χαρακτήρες)
-   - Κλήση `ascii.Generate(text, banner, color, letters)`
-   - Render αποτελέσματος στο template
-   - Σωστά HTTP status codes σε κάθε περίπτωση
+**C** — writer για `.json` (struct + escaping των newlines, `application/json`) · error handling για export χωρίς αποτέλεσμα · μήνυμα feedback στον χρήστη + styling
 
-4. **Error handling**
-   - Custom σελίδες/μηνύματα για 400, 404, 500
-   - Χρήση `http.Error()` ή template rendering
+### Docker
 
-#### Παραδοτέα
+**A** — φάκελος `static/` + route `FileServer` στο `main.go` · μεταφορά του inline `<style>` σε `static/style.css` · βασικό Dockerfile (προσοχή στο `COPY`: χρειάζονται **server, static, templates, banners**) · build & run, επιβεβαίωση ότι σηκώνεται
 
-- [ ] Server εκκινεί στο port 8080
-- [ ] GET `/` επιστρέφει HTML φόρμα με `200`
-- [ ] POST `/ascii-art` επιστρέφει αποτέλεσμα με `200`
-- [ ] Λανθασμένο input → `400`
-- [ ] Άγνωστο path → `404`
-- [ ] Server error → `500`
+**B** — `LABEL` metadata · `.dockerignore` · multi-stage build για μικρό image · επαλήθευση filesystem με `docker exec` · ενοποίηση των 4 error templates με `{{define}}` / `{{template}}` (τώρα είναι 4 σχεδόν ίδια αρχεία)
 
----
+**C** — script build & run (`build_run.sh`) · garbage collection unused objects · README: ενότητα Docker usage · οδηγίες χρήσης μέσα στη σελίδα (το audit ρωτάει αν είναι ξεκάθαρες)
 
-### Άτομο 2 — ASCII Art Logic
+### Stylize
 
-**Αρχεία:** `ascii/ascii.go`, `banners/*.txt`
+**A** — palette + contrast (να διαβάζεται το κείμενο σε κάθε χρώμα) · typography · βασικό layout · consistency σε όλες τις σελίδες
 
-#### Καθήκοντα
+**B** — responsive (media queries) · interactive states: hover, focus, active, disabled
 
-1. **Κατέβασμα banner αρχείων**
-   - `standard.txt`, `shadow.txt`, `thinkertoy.txt`
-   - Πηγή: Zone01 repository / project subject
-   - Επαλήθευση integrity (SHA256 checksums από το subject)
+**C** — user feedback: validation μηνύματα, empty state, ένδειξη φόρτωσης · styling των 4 error pages
 
-2. **Parsing banner αρχείου**
-   - Κάθε banner αρχείο περιέχει ASCII χαρακτήρες από space (32) έως tilde (126)
-   - Κάθε χαρακτήρας έχει ύψος **8 γραμμές**
-   - Χαρακτήρες χωρίζονται με κενή γραμμή
-   - Υλοποίηση `LoadBanner(filename string) (map[rune][]string, error)`
+## 5. Export: γιατί map και όχι switch
 
-3. **Γεννήτρια ASCII art**
-   - Υλοποίηση `Generate(text, banner, color, letters string) (string, error)`
-   - Υποστήριξη `\n` (newline) στο input κείμενο
-   - Για κάθε γραμμή κειμένου: συνένωση των 8 γραμμών κάθε χαρακτήρα οριζόντια
-   - Επιστροφή error για non-printable ή non-ASCII χαρακτήρες
-   - Αν `color` κενό → output χωρίς χρωματισμό
-   - Αν `color` έχει τιμή, `letters` κενό → χρωματίζεται όλο το output
-   - Αν και τα δύο έχουν τιμή → χρωματίζονται μόνο οι εμφανίσεις του `letters` substring
-   - Χρωματισμός μέσω `<span style="color: X">` tags — **όχι** ANSI codes
-
-4. **Unit tests**
-   - Test για κάθε banner style
-   - Test για `\n` στο input
-   - Test για edge cases: κενό string, μόνο newlines, ειδικοί χαρακτήρες
-
-#### Παραδοτέα
-
-- [ ] `LoadBanner` φορτώνει σωστά κάθε banner
-- [ ] `Generate` παράγει σωστό ASCII art για απλό κείμενο
-- [ ] `Generate` χειρίζεται `\n` στο input
-- [ ] `Generate` επιστρέφει error για μη έγκυρο input
-- [ ] `Generate` χρωματίζει όλο το output όταν δίνεται μόνο χρώμα
-- [ ] `Generate` χρωματίζει μόνο το substring όταν δίνονται και τα δύο
-- [ ] Τουλάχιστον 5 unit tests που περνάνε
-
----
-
-### Άτομο 3 — Frontend (Templates & Styling)
-
-**Αρχεία:** `templates/index.html`
-
-#### Καθήκοντα
-
-1. **HTML φόρμα**
-   - `<textarea>` για εισαγωγή κειμένου (name=`text`)
-   - `<select>` για επιλογή banner style (name=`banner`) με options: standard, shadow, thinkertoy
-   - `<select>` για επιλογή χρώματος (name=`color`) με options: black, red, yellow, blue, green, purple, orange, gray, pink, lightblue, lightgreen
-   - `<input type="text">` για substring χρωματισμού (name=`letters`) — προαιρετικό
-   - `<button type="submit">` για αποστολή
-   - Method: `POST`, action: `/ascii-art`
-
-2. **Εμφάνιση αποτελέσματος**
-   - Εμφάνιση ASCII art output μέσα σε `<pre>` tag (για διατήρηση whitespace)
-   - Το template δέχεται Go struct με πεδία: `Text`, `Banner`, `Color`, `Letters`, `Result`, `Error`
-   - Αν υπάρχει `Error`: εμφάνιση μηνύματος σφάλματος
-   - Αν υπάρχει `Result`: εμφάνιση ASCII art (περιέχει `<span>` tags — ΜΗΝ κάνεις escape)
-
-3. **CSS Styling**
-   - Καθαρό, minimal design (inline ή `<style>` tag — χωρίς εξωτερικά CDN)
-   - Monospace font για το `<pre>` output
-   - Responsive layout (κεντραρισμένη φόρμα)
-   - Διαφορετικό styling για error state vs success state
-
-4. **UX βελτιώσεις**
-   - Το κείμενο που έγραψε ο χρήστης παραμένει στο textarea μετά το submit
-   - Το επιλεγμένο banner style παραμένει επιλεγμένο
-   - Το επιλεγμένο χρώμα παραμένει επιλεγμένο
-   - Το letters input διατηρεί την τιμή του μετά το submit
-   - Placeholder text στο textarea
-
-#### Παραδοτέα
-
-- [ ] Φόρμα λειτουργεί (POST στέλνεται σωστά)
-- [ ] ASCII art εμφανίζεται σε `<pre>` με monospace font
-- [ ] Χρωματισμένο ASCII art εμφανίζεται σωστά (τα `<span>` tags δεν escape-άρονται)
-- [ ] Error state εμφανίζεται καθαρά
-- [ ] Επιλογές φόρμας διατηρούνται μετά το submit (text, banner, color, letters)
-- [ ] Χωρίς εξωτερικές εξαρτήσεις (no CDN, no JS frameworks)
-
----
-
-## Go Struct για Templates (κοινό — ορίζει Άτομο 1)
+Ο **πρώτος** στήνει τη μηχανή:
 
 ```go
-// handlers/handlers.go
-type PageData struct {
-    Text    string
-    Banner  string
-    Color   string        // χρώμα επιλογής (π.χ. red, blue, lightgreen)
-    Letters string        // substring που θα χρωματιστεί — αν κενό, χρωματίζεται όλο
-    Result  template.HTML // HTML output — περιέχει <span> tags για χρώματα
-    Error   string
-}
+map[string]<τύπος συνάρτησης writer>
 ```
 
----
+Οι **επόμενοι** δηλώνουν μία γραμμή. Δεν ανοίγουν τη συνάρτηση του πρώτου, δεν ξηλώνουν τίποτα.
 
-## Interface μεταξύ ατόμων
+Με `switch` θα γράφαμε και οι τρεις μέσα στο ίδιο σώμα συνάρτησης — και στον Γύρο 3 θα είχαμε σκάλα από `case`.
 
-| Από | Προς | Interface |
-|-----|------|-----------|
-| Άτομο 1 | Άτομο 2 | `ascii.Generate(text, banner, color, letters string) (string, error)` |
-| Άτομο 1 | Άτομο 3 | `PageData` struct + `templates/index.html` |
-| Άτομο 2 | Άτομο 1 | Επιστρέφει `(string, error)` — output με `<span>` tags για χρώματα |
+Δεύτερο όφελος: για να δηλώσεις σωστά, **πρέπει** να διαβάσεις τι υπογραφή περιμένει το map. Το «διάβασε τον προηγούμενο» δεν είναι κανόνας καλής θέλησης — είναι ψημένο στην αρχιτεκτονική.
 
----
+## 6. Κανόνες ομάδας
 
-## Σειρά Εργασίας (Suggested Timeline)
+- **Barrier**: περιμένουμε να τελειώσουν όλοι τον γύρο πριν προχωρήσουμε.
+- **Δεν υπερβάλλουμε σε ζήλο.** Κάνουμε το κομμάτι μας και σταματάμε. Δεν «φτιάχνουμε λιγάκι» το επόμενο — αλλιώς ο επόμενος βρίσκει δουλειά μισοκαμωμένη και δεν μαθαίνει τίποτα.
+- **Όσο περιμένεις**: βοηθάς τους άλλους, ή ασχολείσαι με άλλο project. Πιέζεις όποιον έχει αργήσει πολύ και προσπαθείς να λύσετε μαζί το πρόβλημα.
+- **Κόλλημα**: το συζητάμε από κοντά ή στο Discord. Δεν κάθεσαι μέρες σιωπηλός.
+- **Παράδοση**: με το που τελειώνεις, γράφεις σύντομο σημείωμα — όχι «τι έκανα», αλλά **τι πρέπει να ξέρει ο επόμενος για να συνεχίσει**.
 
-```
-Μέρα 1:  Άτομο 2 → κατεβάζει banners + υλοποιεί LoadBanner
-          Άτομο 1 → στήνει skeleton server (main.go + routes)
-          Άτομο 3 → φτιάχνει HTML φόρμα (στατική, χωρίς data)
+## 7. Το audit ως απόδειξη
 
-Μέρα 2:  Άτομο 2 → υλοποιεί Generate + tests
-          Άτομο 1 → POST handler + integration με ascii.Generate
-          Άτομο 3 → Go template rendering + CSS
+**9 audits, ο καθένας μόνος του.** Θα κληθείς να εξηγήσεις κώδικα που δεν έγραψες ολόκληρο. Δεν συμφέρει να κλέψεις.
 
-Μέρα 3:  Ολοκλήρωση → error handling, edge cases, testing ολόκληρης εφαρμογής
-```
+Πριν πάμε για audit, **καθόμαστε όλοι μαζί** και βλέπουμε τι ξέρουμε — ώστε να μπορεί ο καθένας να μιλήσει για όλα.
 
----
+## 8. Ανοιχτά
 
-## Έλεγχος Ολοκλήρωσης (Definition of Done)
-
-- [ ] `go run .` εκκινεί server χωρίς errors
-- [ ] Όλα τα banner styles παράγουν σωστό output
-- [ ] Σωστά HTTP status codes σε όλες τις περιπτώσεις
-- [ ] `go vet ./...` — χωρίς warnings
-- [ ] Χωρίς χρήση external packages (`go.mod` έχει μόνο `module` + `go` directive)
-- [ ] Δοκιμή με: απλό κείμενο, κείμενο με `\n`, κενό input, μη-ASCII χαρακτήρες
-- [ ] Δοκιμή χρωματισμού: χρώμα χωρίς letters, χρώμα με letters, χωρίς χρώμα
+- Ποιος παίρνει ποια στήλη
+- Επιβεβαίωση του `.rtf` πριν κλειδώσει
