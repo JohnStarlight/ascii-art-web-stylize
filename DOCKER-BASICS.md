@@ -445,15 +445,49 @@ COPY . .
 CMD ["cat", "data/file.txt"]
 ```
 
+```bash
+docker build -t lab . && docker run --rm lab
+```
+
 Δουλεύει — το `data/file.txt` είναι σχετικό path και επιλύεται ως προς το `/app`.
 
-Τώρα άλλαξε **μόνο** το WORKDIR σε `/somewhere-else` και ξανατρέξε:
+#### ⚠️ Προσοχή: δεν αρκεί να αλλάξεις το WORKDIR
 
+Ίσως σκεφτείς «βάζω `/somewhere-else` αντί για `/app` και θα σκάσει». **Δεν θα σκάσει** — και ο λόγος είναι το ίδιο το μάθημα.
+
+Αλλάζοντας το ένα `WORKDIR` μετακινείς **και τα δύο** πράγματα ταυτόχρονα: ο προορισμός του `COPY` (η δεύτερη τελεία) είναι σχετικός ως προς το WORKDIR, οπότε **τα αρχεία ακολουθούν**. Μετακίνησες και το σπίτι και τον ένοικο.
+
+Για να δεις την αποτυχία πρέπει να **χωρίσεις** τις δύο λειτουργίες — δεύτερο `WORKDIR` **μετά** το `COPY`:
+
+```dockerfile
+FROM alpine
+WORKDIR /app
+COPY . .
+WORKDIR /somewhere-else
+CMD ["cat", "data/file.txt"]
+```
+
+```bash
+docker build -t lab . && docker run --rm lab
+```
 ```
 cat: can't open 'data/file.txt': No such file or directory
 ```
 
-Ο κώδικας δεν άλλαξε. Το αρχείο υπάρχει στο image. Απλώς το process ψάχνει από λάθος σημείο.
+Τα αρχεία προσγειώθηκαν στο `/app` — το WORKDIR που ίσχυε **τη στιγμή του `COPY`**. Το process όμως ξεκινά στο `/somewhere-else`.
+
+Επιβεβαίωσέ το με τα μάτια σου:
+
+```bash
+docker run --rm -it lab sh
+```
+```sh
+pwd                    # /somewhere-else — άδειο
+ls /app/data           # file.txt — εδώ ήταν όλη την ώρα
+exit
+```
+
+Ο κώδικας δεν άλλαξε. Το αρχείο **υπάρχει** στο image. Απλώς κανείς δεν το ψάχνει εκεί.
 
 > **Αυτό ακριβώς παθαίνει η εφαρμογή σου.** Το [handlers.go](handlers/handlers.go) κάνει `template.ParseFiles("templates/index.html")` και το [ascii.go](ascii/ascii.go) κάνει `filepath.Join("banners", ...)`. Σχετικά paths, και τα δύο. Αν το `WORKDIR` δεν είναι εκεί που κάθονται τα `templates/` και `banners/`, ο server **σηκώνεται μια χαρά** και κάθε request γυρνάει 500.
 
