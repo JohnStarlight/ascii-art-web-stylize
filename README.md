@@ -42,6 +42,7 @@ This project is the web version of the `ascii-art` exercise: instead of a CLI, i
 
 ```
 ascii-art-web/
+├── Dockerfile           # container image definition
 ├── main.go              # server startup and routing
 ├── handlers/
 │   └── handlers.go      # HTTP handlers, validation, template rendering
@@ -63,6 +64,8 @@ ascii-art-web/
 
 - Go 1.25.5 or later (see [go.mod](go.mod))
 - No external dependencies — standard library only
+
+Alternatively, run it with Docker and skip the Go installation entirely — see [Running with Docker](#running-with-docker).
 
 ## Usage
 
@@ -91,6 +94,60 @@ http://localhost:8080
 - Only printable ASCII characters (codes 32–126) are supported; anything else returns a `400 Bad Request` with an error message.
 - Newlines in the textarea produce separate stacked ASCII-art blocks, one per line of input.
 - Leaving text empty, or choosing an invalid banner, also returns a `400 Bad Request`.
+
+## Running with Docker
+
+The project ships with a `Dockerfile`, so it can be built and run without installing Go locally.
+
+**Requirements:** Docker installed and the Docker daemon running (on macOS/Windows, start Docker Desktop first).
+
+### Build the image
+
+From the project root:
+
+```bash
+docker build -t ascii-art-web .
+```
+
+This compiles the server inside the image. The first build downloads the `golang` base image and takes a while; later builds reuse the cache and are much faster.
+
+### Run the container
+
+```bash
+docker run --rm -p 8080:8080 ascii-art-web
+```
+
+Then open <http://localhost:8080> as usual.
+
+- `-p 8080:8080` maps port `8080` on your machine to port `8080` inside the container. The right-hand side must stay `8080` because that is where the server listens (see [main.go](main.go)); the left-hand side can be any free port, e.g. `-p 3000:8080`.
+- `--rm` removes the container once it stops, so stopped containers don't pile up.
+
+The terminal stays attached and shows the server log. **Press `Ctrl+C` to stop it.**
+
+To run it in the background instead:
+
+```bash
+docker run -d --rm -p 8080:8080 --name ascii ascii-art-web
+docker logs -f ascii      # follow the log
+docker stop ascii         # stop it
+```
+
+### Verifying it works
+
+Starting up is not proof that it works — the server can start fine and still fail on every request if the files it reads at runtime aren't where it expects. Check all three:
+
+```bash
+curl -i localhost:8080/
+curl -i -X POST localhost:8080/ascii-art -d "text=hello" -d "banner=standard"
+curl -i localhost:8080/static/style.css
+```
+
+The second one matters most: it is the only request that forces the server to read a banner file, which is what proves the container's working directory is correct.
+
+### Implementation notes
+
+- The server reads `templates/` and `banners/` using **paths relative to its working directory**, so the image sets `WORKDIR /app` and copies the project there. Changing the working directory without moving those folders makes every request fail with `500`, even though the container starts normally.
+- The whole project directory is copied into the image, so anything the build needs must be committed to git — otherwise the image builds locally but breaks for everyone else.
 
 ## HTTP status codes
 
