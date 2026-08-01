@@ -5,50 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ASCII Art Web</title>
-    <style>
-        pre {
-            font-family: monospace;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-        }
-        #container {
-            width: 90%;
-            margin: 0 auto;
-            border: 1px solid #ccc;
-            padding: 20px;
-        }
-
-        #main-content {
-            display: flex; /* Ενεργοποιούμε το Flexbox */
-            gap: 30px;     /* Απόσταση μεταξύ των δύο στηλών */
-            flex-direction: column /* Αλλάζει την κατευθυνση του flexbox σε κάθετη */
-        }
-
-        #controls {
-            flex: 1;       /* Πιάνει το 1/3 του χώρου */
-            background: #f9f9f9;
-            padding: 15px;
-        }
-
-        #preview {
-            flex: 2;       /* Πιάνει τα 2/3 του χώρου */
-            padding: 15px;
-        }
-
-        #text {
-            width: 50%;
-            height: 20px;
-            resize: none;
-        }
-        form {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-    </style>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 
-<body>
+<body class="theme-guest">
     <div id="container">
         <div id="header">
             <h1>ASCII Art Web</h1>
@@ -77,9 +37,10 @@
                     </select>
                     <input type="text" name="letters" value="{{.Letters}}" placeholder="Letters to color (empty = all)">
                     <button type="submit">Generate</button>
+                    <button type="submit" formaction="/export">Export as .txt</button>
                 </form>
             </div>
-            <div id="preview" style="background-color: lightgray">
+            <div id="preview">
                  {{if .Error}}
                 <p>Error: {{.Error}}</p>
                 {{end}}

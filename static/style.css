@@ -1,0 +1,85 @@
+#container {
+  width: 90%;
+  max-width: 1100px;
+  margin: 40px auto;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: 25px;
+  background: rgba(0, 0, 0, 0.55);
+  /* ημιδιαφανές φόντο */
+  backdrop-filter: blur(8px);
+}
+
+#header h1{
+  text-align: center;
+  color: #f0f0f0;
+  margin-bottom: 25px;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+}
+
+body {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  min-height: 100vh;
+  margin: 0;
+  transition: background-image 0.4s ease;
+}
+
+#controls {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 18px;
+}
+
+#preview {
+  background-color: rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  color: #eee;
+}
+
+/* Guest (default) */
+body.theme-guest {
+  background-image: url('/static/backgrounds/guest.jpg');
+}
+
+/* old css transported from index */
+pre {
+  font-family: monospace;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+/* πρωσορινή λυση για να φαινετε στο black το generated text
+!important είναι προσωρινό μέχρι να φτιάξουμε σωστά τα χρώματα ανά theme.
+Μην το πειράξετε */
+#preview pre {
+  color: #e0e0e0 !important;
+}
+
+#preview pre span {
+  color: #e0e0e0 !important;
+}
+/* πρωσορινή λυση για να φαινετε στο black το generated text */
+
+#main-content {
+  display: flex;
+  /* Ενεργοποιούμε το Flexbox */
+  gap: 30px;
+  /* Απόσταση μεταξύ των δύο στηλών */
+  flex-direction: column;
+    /* Αλλάζει την κατευθυνση του flexbox σε κάθετη */
+}
+
+#text {
+  width: 50%;
+  height: 20px;
+  resize: none;
+}
+
+form {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
