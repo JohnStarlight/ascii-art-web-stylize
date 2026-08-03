@@ -1,53 +1,4 @@
-
-#container {
-  width: 90%;
-  max-width: 1100px;
-  margin: 0 auto;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 16px;
-  padding: 24px;
-  background: rgba(0, 0, 0, 0.55);
-  /* ημιδιαφανές φόντο */
-  backdrop-filter: blur(10px);
-}
-
-#header h1{
-  text-align: center;
-  color: #f0f0f0;
-  margin-bottom: 25px;
-  text-shadow: 0 2px 8px rgba(0,0,0,0.6);
-}
-
-#controls {
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  padding: 20px;
-}
-
-#preview {
-  background-color: rgba(255, 255, 255, 0.12);
-  border-radius: 8px;
-  color: #eee;
-}
-
-#main-content {
-  display: flex;            /* Ενεργοποιούμε το Flexbox */
-  gap: 20px;                /* Απόσταση μεταξύ των δύο στηλών */
-  flex-direction: column;   /* Αλλάζει την κατευθυνση του flexbox σε κάθετη */
-}
-
-#text {
-  width: 280px;             /* σταθερό πλάτος */
-  height: 100px;            /* πιο ψηλό για να γράφει άνετα */
-  resize: none;             /* δεν μεγαλώνει */
-  padding: 10px 12px;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: rgba(0, 0, 0, 0.45);
-  color: #f0f0f0;
-  font-size: 15px;
-}
-
+/* ===== Base ===== */
 body {
   min-height: 100vh;
   margin: 0;
@@ -58,28 +9,16 @@ body {
   background-position: center;
   background-repeat: no-repeat;
   background-attachment: fixed;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.5;
+  transition: background-image 0.4s ease;
 }
 
-form {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  gap: 12px;
-}
-
-/* Guest (default) */
+/* ===== Themes ===== */
 body.theme-guest {
   background-image: url('/static/backgrounds/guest.jpg');
 }
 
-/* old css transported from index */
-pre {
-  font-family: monospace;
-  white-space: pre-wrap;
-  word-wrap: break-word;
-}
-
-/* Themes */
 body.theme-ai {
   background-image: url('/static/backgrounds/ai.jpg');
 }
@@ -92,21 +31,83 @@ body.theme-keys {
   background-image: url('/static/backgrounds/keys.jpg');
 }
 
-
-/* πρωσορινή λυση για να φαινετε στο black το generated text
-!important είναι προσωρινό μέχρι να φτιάξουμε σωστά τα χρώματα ανά theme.
-Μην το πειράξετε */
-#preview pre {
-  color: #e0e0e0 !important;
+/* ===== Layout ===== */
+#container {
+  width: 90%;
+  max-width: 1100px;
+  margin: 0 auto;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(10px);
 }
 
-#preview pre span {
-  color: #e0e0e0 !important;
+#header h1 {
+  text-align: center;
+  margin: 0 0 18px 0;
+  color: #f5f5f5;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
 }
 
-/* πρωσορινή λυση για να φαινετε στο black το generated text */
+#main-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
 
-/* select + input πιάνει και τις δύο κατηγορίες */
+#controls {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+#preview {
+  min-height: 220px;
+  background-color: rgba(255, 255, 255, 0.10);
+  border-radius: 12px;
+  padding: 18px;
+  color: #eee;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.section-title {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.65);
+  margin-bottom: 12px;
+}
+
+#preview .section-title {
+  font-size: 13px;
+}
+
+/* ===== Form ===== */
+form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+#text {
+  width: 260px;
+  height: 100px;
+  resize: none;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.45);
+  color: #f0f0f0;
+  font-size: 14px;
+  font-family: inherit;
+}
+
 select,
 input[name="letters"] {
   height: 42px;
@@ -116,14 +117,14 @@ input[name="letters"] {
   border: 1px solid rgba(255, 255, 255, 0.2);
   background: rgba(0, 0, 0, 0.45);
   color: #f0f0f0;
+  font-size: 14px;
+  font-family: inherit;
 }
-
-/* Κουμπιά */
 
 .button-group {
   display: flex;
   gap: 10px;
-  margin-left: auto;        /* τα σπρώχνει δεξιά */
+  margin-left: auto;
 }
 
 button {
@@ -131,14 +132,60 @@ button {
   padding: 0 18px;
   border-radius: 8px;
   border: none;
-  background: #4f46e5;
-  color: white;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
+  transition: background 0.2s ease;
 }
 
-/* Αυτό είναι responsive μπενει σαν παραδειγμα πως αλλαζεις το hover στο button */
-button:hover {
+button[type="submit"]:not([formaction]) {
+  background: #111827;
+  color: #fff;
+}
+
+button[type="submit"]:not([formaction]):hover {
+  background: #1f2937;
+}
+
+button[formaction="/export"] {
+  background: #4f46e5;
+  color: #fff;
+}
+
+button[formaction="/export"]:hover {
   background: #6366f1;
 }
 
+/* ===== Theme select (fixed) ===== */
+#theme-select {
+  position: fixed !important;
+  top: 18px !important;
+  right: 18px !important;
+  left: auto !important;
+  z-index: 9999 !important;
+  height: 38px !important;
+  min-width: 160px;
+  padding: 0 14px !important;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(0, 0, 0, 0.75) !important;
+  color: #f0f0f0 !important;
+  font-size: 14px;
+}
+
+/* ===== ASCII result ===== */
+pre {
+  font-family: "Courier New", Courier, monospace;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+#preview pre {
+  color: #e0e0e0 !important;
+  font-size: 14px;
+  line-height: 1.25;
+}
+
+#preview pre span {
+  color: #e0e0e0 !important;
+}
