@@ -228,3 +228,21 @@ pre {
 #preview pre span {
   color: #f3f4f6 !important;
 }
+
+/*γενικό πλαίσιο container*/
+#container h1 {
+  color: #f5f5f5;
+}
+
+#container p {
+  color: #e5e7eb;
+}
+
+#container a {
+  color: #a5b4fc;
+  text-decoration: none;
+}
+
+#container a:hover {
+  text-decoration: underline;
+}
