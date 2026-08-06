@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ASCII Art Web</title>
-    <link rel="stylesheet" href="/static/style.css">    <!-- Καλει το style.css -->
-    <script src="/static/theme.js"></script>            <!-- Καλει το theme.js -->
+    <link rel="stylesheet" href="/static/style.css"> <!-- Καλει το style.css -->
+    <script src="/static/theme.js"></script> <!-- Καλει το theme.js -->
 </head>
 
 <body class="theme-guest">
@@ -15,7 +15,7 @@
         <option value="theme-ai">AI (ppetraki)</option>
         <option value="theme-pink">Pink (balevizos)</option>
         <option value="theme-keys">Keys (ivogiagke)</option>
-    </select> 
+    </select>
     <div id="container">
         <div id="header">
             <h1>ASCII Art Web</h1>
@@ -25,9 +25,9 @@
                 <div class="section-title">Controls</div>
                 <form method="POST" action="/ascii-art">
                     <textarea id="text" name="text" placeholder="Type your text">{{.Text}}</textarea>
-        
+
                     <input type="text" name="letters" value="{{.Letters}}" placeholder="Substring">
-        
+
                     <select name="banner">
                         <option value="standard" {{if eq .Banner "standard" }}selected{{end}}>Standard</option>
                         <option value="shadow" {{if eq .Banner "shadow" }}selected{{end}}>Shadow</option>
@@ -35,7 +35,7 @@
                     </select>
 
                     <select id="color" name="color">
-                        <option value="black" {{if eq .Color "black" }}selected{{end}}>Black (default)</option>
+                        <option value="black" {{if eq .Color "black" }}selected{{end}}>Default</option>
                         <option value="red" {{if eq .Color "red" }}selected{{end}}>Red</option>
                         <option value="yellow" {{if eq .Color "yellow" }}selected{{end}}>Yellow</option>
                         <option value="blue" {{if eq .Color "blue" }}selected{{end}}>Blue</option>
@@ -47,14 +47,14 @@
                         <option value="lightblue" {{if eq .Color "lightblue" }}selected{{end}}>Light Blue</option>
                         <option value="lightgreen" {{if eq .Color "lightgreen" }}selected{{end}}>Light Green</option>
                     </select>
-        
+
                     <div class="button-group">
                         <button type="submit">Generate</button>
                         <button type="submit" formaction="/export">Export as .txt</button>
                     </div>
                 </form>
             </div>
-        
+
             <div id="preview">
                 <div class="section-title">PREVIEW</div>
                 {{if .Error}}
@@ -64,7 +64,7 @@
                 <pre>{{.Result}}</pre>
                 {{end}}
             </div>
-        </div>   
+        </div>
     </div>
 </body>
 

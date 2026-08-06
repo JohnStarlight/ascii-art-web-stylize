@@ -226,7 +226,7 @@ pre {
 /* ASCII text contrast */
 #preview pre,
 #preview pre span {
-  color: #f3f4f6 !important;
+  color: #f3f4f6;
 }
 
 /*γενικό πλαίσιο container*/
