@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"bytes"
+	"fmt"
 	"html/template"
 	"net/http"
 	"os"
@@ -197,27 +198,39 @@ func renderTemplate(w http.ResponseWriter, data PageData, status int) {
 	buf.WriteTo(w)
 }
 
-// statusTemplate φορτώνει και εκτελεί τα αντίστοιχα HTML template ανα status code (400, 404, 405, 500)
+// statusTemplate συναρμολογεί το κοινό layout.html με το ειδικό περιεχόμενο
+// του κάθε status code (400, 404, 405, 500) και το εκτελεί.
 func statusTemplate(w http.ResponseWriter, status int) {
-	var tmpl *template.Template
-	var err error
+	var contentFile string
 	switch status {
 	case http.StatusBadRequest:
-		tmpl, err = template.ParseFiles("templates/400.html")
+		contentFile = "templates/400.html"
 	case http.StatusNotFound:
-		tmpl, err = template.ParseFiles("templates/404.html")
+		contentFile = "templates/404.html"
 	case http.StatusMethodNotAllowed:
-		tmpl, err = template.ParseFiles("templates/405.html")
+		contentFile = "templates/405.html"
 	case http.StatusInternalServerError:
-		tmpl, err = template.ParseFiles("templates/500.html")
+		contentFile = "templates/500.html"
 	default:
 		http.Error(w, "500 - Internal Server Error", http.StatusInternalServerError)
 		return
 	}
+
+	// ParseFiles φορτώνει layout.html + το ειδικό content αρχείο μαζί, στο ίδιο
+	// template set — έτσι το {{template "content" .}} μέσα στο layout βρίσκει
+	// το σωστό {{define "content"}} block.
+	tmpl, err := template.ParseFiles("templates/layout.html", contentFile)
 	if err != nil {
 		http.Error(w, "500 - Internal Server Error", http.StatusInternalServerError)
 		return
 	}
+
+	// Το title/h1 είναι ίδιο κείμενο σε όλες τις σελίδες (π.χ. "400 Bad Request"),
+	// οπότε το υπολογίζουμε από το status code αντί να το επαναλαμβάνουμε.
+	data := struct{ Title string }{
+		Title: fmt.Sprintf("%d %s", status, http.StatusText(status)),
+	}
+
 	w.WriteHeader(status)
-	tmpl.Execute(w, nil)
+	tmpl.ExecuteTemplate(w, "layout", data)
 }
