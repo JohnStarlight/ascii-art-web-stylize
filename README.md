@@ -147,7 +147,7 @@ The second one matters most: it is the only request that forces the server to re
 ### Implementation notes
 
 - The server reads `templates/` and `banners/` using **paths relative to its working directory**, so the image sets `WORKDIR /app` and copies the project there. Changing the working directory without moving those folders makes every request fail with `500`, even though the container starts normally.
-- The whole project directory is copied into the image, so anything the build needs must be committed to git — otherwise the image builds locally but breaks for everyone else.
+- The `Dockerfile` is a **multi-stage build**: the first stage (`golang:1.25.5`, tagged `AS builder`) compiles the server with `CGO_ENABLED=0` for a fully static binary; the second stage (`alpine:latest`) copies in **only** `server`, `templates/`, `banners/`, and `static/` — nothing else from the project makes it into the final image. This keeps the shipped image small (~33MB vs. ~1.4GB for a single-stage build) and means anything the *build* needs must be committed to git (Stage 1 still copies the whole project), even though the *final* image only ships a handful of files.
 
 ## HTTP status codes
 
