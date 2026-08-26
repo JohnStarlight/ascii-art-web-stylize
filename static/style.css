@@ -185,7 +185,7 @@ button[type="submit"]:not([formaction]) {
    Ο Person 2 (Stylize B) θα το επεκτείνει με focus/active κλπ.
    ========================= */
 
-button[type="submit"]:not([formaction]):hover {
+button[type="submit"]:not([formaction]):not(:disabled):hover {
   background: #1f2937;
 }
 
@@ -194,7 +194,7 @@ button[formaction="/export"] {
   color: #fff;
 }
 
-button[formaction="/export"]:hover {
+button[formaction="/export"]:not(:disabled):hover {
   background: #6366f1;
 }
 
@@ -266,9 +266,9 @@ select {
   transition: border-color 0.2s ease, background 0.2s ease;
 }
 
-#text:hover,
-input[name="letters"]:hover,
-select:hover {
+#text:not(:disabled):hover,
+input[name="letters"]:not(:disabled):hover,
+select:not(:disabled):hover {
   border-color: var(--field-border-hover);
   background: var(--field-bg-hover);
 }
@@ -276,11 +276,19 @@ select:hover {
 /* Το #theme-select χρειάζεται δικό του κανόνα: ο κανόνας του Stylize A
    στη γραμμή 212 χρησιμοποιεί ID (μεγαλύτερη specificity από το select:hover),
    και το background του είναι !important — οπότε το ταιριάζουμε */
-#theme-select:hover {
+#theme-select:not(:disabled):hover {
   border-color: var(--field-border-hover);
   background: var(--field-bg-hover) !important;
 }
 
 button:active {
   transform: translateY(1px);
+}
+
+button:disabled,
+#text:disabled,
+input[name="letters"]:disabled,
+select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
