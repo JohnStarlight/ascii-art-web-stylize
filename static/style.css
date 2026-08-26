@@ -1,6 +1,8 @@
 /* ===== Tokens (Stylize B) ===== */
 :root {
   --focus-ring: #a5b4fc;
+  --field-border-hover: rgba(255, 255, 255, 0.45);
+  --field-bg-hover: rgba(0, 0, 0, 0.55);
 }
 
 /* ===== Base ===== */
@@ -251,3 +253,31 @@ pre {
 #container a:hover {
   text-decoration: underline;
 }
+
+/* ===== Interactive states (Stylize B) ===== */
+:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+#text,
+input[name="letters"],
+select {
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+#text:hover,
+input[name="letters"]:hover,
+select:hover {
+  border-color: var(--field-border-hover);
+  background: var(--field-bg-hover);
+}
+
+/* Το #theme-select χρειάζεται δικό του κανόνα: ο κανόνας του Stylize A
+   στη γραμμή 212 χρησιμοποιεί ID (μεγαλύτερη specificity από το select:hover),
+   και το background του είναι !important — οπότε το ταιριάζουμε */
+#theme-select:hover {
+  border-color: var(--field-border-hover);
+  background: var(--field-bg-hover) !important;
+}
+
