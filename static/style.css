@@ -274,8 +274,8 @@ select:not(:disabled):hover {
 }
 
 /* Το #theme-select χρειάζεται δικό του κανόνα: ο κανόνας του Stylize A
-   στη γραμμή 212 χρησιμοποιεί ID (μεγαλύτερη specificity από το select:hover),
-   και το background του είναι !important — οπότε το ταιριάζουμε */
+   χρησιμοποιεί ID (μεγαλύτερη specificity από το select:hover) και το
+   background του είναι !important — οπότε το ταιριάζουμε */
 #theme-select:not(:disabled):hover {
   border-color: var(--field-border-hover);
   background: var(--field-bg-hover) !important;
@@ -291,4 +291,138 @@ input[name="letters"]:disabled,
 select:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+/* Το ASCII art δεν πρέπει να σπάει σε γραμμές — χάνεται το σχέδιο.
+   Αντί για αναδίπλωση, οριζόντια κύλιση μέσα στο preview. */
+#preview pre {
+  white-space: pre;
+  overflow-x: auto;
+}
+
+/* ===== Layout φόρμας (Stylize B) ===== */
+
+/* Ο τίτλος "Controls" και το theme picker στην ίδια γραμμή,
+   το picker δεξιά. Ήταν position: fixed — μπαίνει στη ροή. */
+.controls-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+/* Το κενό μεταφέρθηκε στο .controls-header, ώστε το picker να στοιχίζεται
+   με την κορυφή του τίτλου αντί να κεντράρεται χαμηλότερα */
+.controls-header .section-title {
+  margin-bottom: 0;
+}
+
+/* Μένει στη ροή (static) και παίρνει τις ίδιες διαστάσεις με τα
+   υπόλοιπα controls της φόρμας. Τα !important ταιριάζουν αυτά
+   του αρχικού κανόνα. */
+#theme-select {
+  position: static !important;
+  height: 42px !important;
+  padding: 8px 12px !important;
+}
+
+/* Το #controls γίνεται "container": τα @container παρακάτω ρωτάνε
+   το ΔΙΚΟ ΤΟΥ πλάτος, όχι του παραθύρου. Έτσι τα breakpoints βγαίνουν
+   από τα πλάτη των controls, χωρίς αφαιρέσεις padding. */
+#controls {
+  container-type: inline-size;
+}
+
+/* Η φόρμα γίνεται στήλη αντί για σειρά που αναδιπλώνεται,
+   ώστε όλα τα controls να έχουν το ίδιο πλάτος.
+   Το --control-width ζει εδώ και όχι στο :root, γιατί ένα @container
+   μπορεί να στυλάρει μόνο απογόνους του container. */
+form {
+  flex-direction: column;
+  --control-width: 100%;
+}
+
+#text,
+input[name="letters"],
+.select-row,
+.button-group {
+  width: var(--control-width);
+  box-sizing: border-box;
+}
+
+/* Τα δύο dropdowns μοιράζονται μία γραμμή. Χωρίς flex-wrap εδώ,
+   ώστε να μένουν πάντα δίπλα-δίπλα και απλώς να συρρικνώνονται. */
+.select-row {
+  display: flex;
+  gap: 12px;
+}
+
+.select-row select {
+  flex: 1;
+  min-width: 0;
+}
+
+.button-group {
+  margin-left: 0;
+}
+
+/* Τα δύο κουμπιά μοιράζονται εξίσου το πλάτος της στήλης, όπως τα
+   dropdowns. Το min-width: 0 τους επιτρέπει να συρρικνωθούν αντί να
+   ξεχειλίσουν σε πολύ στενή οθόνη. */
+.button-group button {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Δύο στήλες μόλις χωρέσουν: 260 + 12 (gap) + 260 = 532.
+   Το νούμερο βγαίνει από πρόσθεση, όχι από δοκιμές — αν αλλάξεις το
+   πλάτος στήλης σε X, το κατώφλι γίνεται 2X + 12.
+   Το @container δεν δέχεται var() στη συνθήκη, γι' αυτό είναι γραμμένο
+   αριθμητικά. */
+@container (min-width: 532px) {
+  form {
+    display: grid;
+    /* 1fr = ένα κλάσμα του διαθέσιμου χώρου. Δύο ίσα κλάσματα γεμίζουν
+       το container, οπότε οι στήλες μεγαλώνουν μαζί με την οθόνη αντί
+       να κολλάνε στα 260px. Το minmax(0, ...) εμποδίζει το περιεχόμενο
+       να επιβάλει μεγαλύτερο ελάχιστο και να ξεχειλίσει. */
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    /* Ο κανόνας του Stylize A έχει align-items: flex-start. Στο grid αυτό
+       κρατάει το textarea στο φυσικό του ύψος αντί να γεμίζει τις δύο
+       σειρές — το stretch το αναιρεί. */
+    align-items: stretch;
+  }
+
+  /* Πιάνει και τις δύο σειρές της αριστερής στήλης, οπότε το ύψος
+     του το ορίζει πλέον το πλέγμα και όχι το σταθερό 100px */
+  #text {
+    grid-row: span 2;
+    height: auto;
+  }
+
+  /* Από την πρώτη ως την τελευταία γραμμή του πλέγματος — δηλαδή και
+     τις δύο στήλες μαζί με το κενό τους. Το width: 100% που κληρονομεί
+     μετράει πλέον πάνω σε αυτό το διπλό πλάτος. */
+  .button-group {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Ακριβώς κάτω από το κατώφλι των δύο στηλών (532 − 1): σε μία στήλη
+   το textarea δεν χρειάζεται τα 100px του Stylize A. Παράγεται κι αυτό. */
+@container (max-width: 532px) {
+  #text {
+    height: 80px;
+  }
+}
+
+/* Απόφαση αναλογίας, όχι διάταξης: σε οθόνη τηλεφώνου τα 220px κενού
+   πιάνουν περίπου το ένα τρίτο του ύψους. Δεν παράγεται από πλάτη
+   controls, γι' αυτό είναι media query με συμβατικό νούμερο — και το
+   #preview δεν είναι καν μέσα στο #controls. */
+@media (max-width: 600px) {
+  #preview {
+    min-height: 120px;
+  }
 }
