@@ -1,3 +1,8 @@
+/* ===== Tokens (Stylize B) ===== */
+:root {
+  --focus-ring: #a5b4fc;
+}
+
 /* ===== Base ===== */
 body {
   min-height: 100vh;
