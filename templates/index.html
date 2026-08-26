@@ -10,43 +10,47 @@
 </head>
 
 <body class="theme-guest">
-    <select id="theme-select">
-        <option value="theme-guest">Guest</option>
-        <option value="theme-ai">AI (ppetraki)</option>
-        <option value="theme-pink">Pink (balevizo)</option>
-        <option value="theme-keys">Keys (ivogiake)</option>
-    </select>
     <div id="container">
         <div id="header">
             <h1>ASCII Art Web</h1>
         </div>
         <div id="main-content">
             <div id="controls">
-                <div class="section-title">Controls</div>
+                <div class="controls-header">
+                    <div class="section-title">Controls</div>
+                    <select id="theme-select">
+                        <option value="theme-guest">Guest</option>
+                        <option value="theme-ai">AI (ppetraki)</option>
+                        <option value="theme-pink">Pink (balevizo)</option>
+                        <option value="theme-keys">Keys (ivogiake)</option>
+                    </select>
+                </div>
                 <form method="POST" action="/ascii-art">
                     <textarea id="text" name="text" placeholder="Type your text">{{.Text}}</textarea>
 
                     <input type="text" name="letters" value="{{.Letters}}" placeholder="Substring">
 
-                    <select name="banner">
-                        <option value="standard" {{if eq .Banner "standard" }}selected{{end}}>Standard</option>
-                        <option value="shadow" {{if eq .Banner "shadow" }}selected{{end}}>Shadow</option>
-                        <option value="thinkertoy" {{if eq .Banner "thinkertoy" }}selected{{end}}>Thinkertoy</option>
-                    </select>
+                    <div class="select-row">
+                        <select name="banner">
+                            <option value="standard" {{if eq .Banner "standard" }}selected{{end}}>Standard</option>
+                            <option value="shadow" {{if eq .Banner "shadow" }}selected{{end}}>Shadow</option>
+                            <option value="thinkertoy" {{if eq .Banner "thinkertoy" }}selected{{end}}>Thinkertoy</option>
+                        </select>
 
-                    <select id="color" name="color">
-                        <option value="black" {{if eq .Color "black" }}selected{{end}}>Default</option>
-                        <option value="red" {{if eq .Color "red" }}selected{{end}}>Red</option>
-                        <option value="yellow" {{if eq .Color "yellow" }}selected{{end}}>Yellow</option>
-                        <option value="blue" {{if eq .Color "blue" }}selected{{end}}>Blue</option>
-                        <option value="green" {{if eq .Color "green" }}selected{{end}}>Green</option>
-                        <option value="purple" {{if eq .Color "purple" }}selected{{end}}>Purple</option>
-                        <option value="orange" {{if eq .Color "orange" }}selected{{end}}>Orange</option>
-                        <option value="gray" {{if eq .Color "gray" }}selected{{end}}>Gray</option>
-                        <option value="pink" {{if eq .Color "pink" }}selected{{end}}>Pink</option>
-                        <option value="lightblue" {{if eq .Color "lightblue" }}selected{{end}}>Light Blue</option>
-                        <option value="lightgreen" {{if eq .Color "lightgreen" }}selected{{end}}>Light Green</option>
-                    </select>
+                        <select id="color" name="color">
+                            <option value="black" {{if eq .Color "black" }}selected{{end}}>Default</option>
+                            <option value="red" {{if eq .Color "red" }}selected{{end}}>Red</option>
+                            <option value="yellow" {{if eq .Color "yellow" }}selected{{end}}>Yellow</option>
+                            <option value="blue" {{if eq .Color "blue" }}selected{{end}}>Blue</option>
+                            <option value="green" {{if eq .Color "green" }}selected{{end}}>Green</option>
+                            <option value="purple" {{if eq .Color "purple" }}selected{{end}}>Purple</option>
+                            <option value="orange" {{if eq .Color "orange" }}selected{{end}}>Orange</option>
+                            <option value="gray" {{if eq .Color "gray" }}selected{{end}}>Gray</option>
+                            <option value="pink" {{if eq .Color "pink" }}selected{{end}}>Pink</option>
+                            <option value="lightblue" {{if eq .Color "lightblue" }}selected{{end}}>Light Blue</option>
+                            <option value="lightgreen" {{if eq .Color "lightgreen" }}selected{{end}}>Light Green</option>
+                        </select>
+                    </div>
 
                     <div class="button-group">
                         <button type="submit">Generate</button>
