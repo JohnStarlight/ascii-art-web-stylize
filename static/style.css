@@ -281,3 +281,6 @@ select:hover {
   background: var(--field-bg-hover) !important;
 }
 
+button:active {
+  transform: translateY(1px);
+}
